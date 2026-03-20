@@ -3,206 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>极客跳动智算平台 - GEO 场景速查</title>
+    <title>极客跳动智算平台 - 生产环境</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --geek-red: #DA251C; --geek-dark: #1a1a1a; }
-        body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background-color: #f5f7fa; }
+        :root { --geek-red: #DA251C; }
+        body { font-family: "PingFang SC", sans-serif; background-color: #f8fafc; }
         
-        /* 1. 侧边栏基础样式 */
-        .sidebar-item:hover { background-color: #fef2f2; color: var(--geek-red); }
-        .sidebar-active { background-color: var(--geek-red) !important; color: white !important; font-weight: bold; }
-        
-        /* 2. 框住的二级菜单 (子菜单) 基础样式 */
+        /* 侧边栏激活项居中放大 */
         .sub-menu { 
-            padding: 0 1rem; 
-            font-size: 0.8rem; /* 默认字号较小 */
-            color: #666; 
-            cursor: pointer; 
-            height: 38px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: flex-start; /* 默认左对齐 */
-            border-right: 2px solid transparent; 
-            transition: all 0.2s;
+            padding: 0 1.5rem; font-size: 0.875rem; color: #64748b; cursor: pointer; 
+            height: 40px; display: flex; align-items: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .sub-menu:hover { color: var(--geek-red); background-color: #fef2f2; }
-
-        /* 3. 【核心修改】：针对激活状态（被框住）子菜单的居中和放大样式 */
         .sub-menu.sidebar-active { 
-            justify-content: center !important; /* 排版居中 */
-            font-size: 1.2rem !important;      /* 字号放大到 text-lg */
-            height: 52px !important;            /* 对应增加高度 */
-            padding: 0.5rem 1rem !important;    /* 增加上下内边距 */
-            letter-spacing: 0.05em;             /* 增加一点字间距提高可读性 */
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); /* 增加一点内阴影增强选中感 */
+            background-color: var(--geek-red); color: white !important; 
+            justify-content: center; font-size: 1.125rem; font-weight: 700; height: 56px;
+            box-shadow: 0 4px 12px rgba(218, 37, 28, 0.2);
         }
-
-        /* 其他功能性样式 */
-        .card-shadow { box-shadow: 0 2px 12px 0 rgba(0,0,0,0.05); }
-        .geek-btn { background-color: #DA251C; color: white; transition: all 0.3s; }
-        .geek-btn:hover { background-color: #b91c1c; transform: translateY(-1px); shadow: 0 4px 6px rgba(218, 37, 28, 0.2); }
-        .page { display: none; }
-        .page.active { display: block; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* 自定义进度条颜色 */
-        .progress-red { background-color: #DA251C; }
+        .page { display: none; animation: fadeIn 0.4s ease-out; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .loading-spinner { border: 3px solid #f3f3f3; border-top: 3px solid var(--geek-red); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden text-gray-800">
+<body class="flex h-screen overflow-hidden text-slate-800">
 
-    <aside class="w-64 bg-white border-r flex flex-col flex-shrink-0 z-10 shadow-lg">
-        <div class="p-4 border-b flex items-center space-x-2">
-            <img src="logo.png" alt="极客跳动" class="h-10 w-10 rounded-full object-cover border border-gray-100">
-            <div class="flex flex-col">
-                <span class="font-bold text-sm tracking-tighter">极客跳动</span>
-                <span class="text-[9px] text-gray-400 uppercase tracking-widest font-bold">GeekDance GEO</span>
+    <aside class="w-64 bg-white border-r flex flex-col shadow-xl z-20">
+        <div class="p-6 border-b flex items-center space-x-3">
+            <img src="logo.png" class="h-10 w-10 rounded-lg shadow-sm">
+            <div>
+                <p class="font-black text-sm tracking-tight">极客跳动</p>
+                <p class="text-[10px] text-slate-400 font-bold uppercase">GeekDance Engine</p>
             </div>
         </div>
         
-        <div class="flex-1 overflow-y-auto no-scrollbar py-2">
-            <div class="group">
-                <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
-                    <span class="text-xs font-bold flex items-center"><span class="mr-2 text-red-600">🧭</span> GEO 场景速查</span>
-                    <span class="text-[10px] text-gray-400">▲</span>
-                </div>
-                <div onclick="switchPage('page-dashboard')" class="sub-menu sidebar-active">品牌能见度智查</div>
-                <div onclick="switchPage('page-batch')" class="sub-menu">多平台批量查</div>
-            </div>
-
-            <div class="group mt-2">
-                <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
-                    <span class="text-xs font-bold flex items-center"><span class="mr-2 text-red-600">🔍</span> 提问词管理</span>
-                    <span class="text-[10px] text-gray-400">▲</span>
-                </div>
-                <div onclick="switchPage('page-mining')" class="sub-menu">提问词挖掘</div>
-                <div onclick="switchPage('page-monitor')" class="sub-menu">打点管理</div>
-            </div>
-
-            <div class="group mt-2">
-                <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
-                    <span class="text-xs font-bold flex items-center"><span class="mr-2 text-red-600">✍️</span> 内容制作</span>
-                    <span class="text-[10px] text-gray-400">▲</span>
-                </div>
-                <div onclick="switchPage('page-plan')" class="sub-menu">供给计划</div>
-                <div onclick="switchPage('page-editor')" class="sub-menu">高引用率创作</div>
-            </div>
-
-            <div class="group mt-2">
-                <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
-                    <span class="text-xs font-bold flex items-center"><span class="mr-2 text-red-600">🔗</span> AI 引用追踪</span>
-                    <span class="text-[10px] text-gray-400">▲</span>
-                </div>
-                <div onclick="switchPage('page-trace-upload')" class="sub-menu">上传查询</div>
-                <div onclick="switchPage('page-trace-detail')" class="sub-menu">引用详情</div>
-            </div>
-        </div>
-
-        <div class="p-4 border-t space-y-2 bg-gray-50">
-            <div class="flex items-center text-xs text-gray-500 px-2 py-1 hover:text-red-600 cursor-pointer transition">⚙️ 企业设置</div>
-            <div class="flex items-center text-xs text-gray-500 px-2 py-1 hover:text-red-600 cursor-pointer transition">👥 极客工作流程</div>
-        </div>
+        <nav class="flex-1 overflow-y-auto py-4 space-y-1">
+            <div class="px-6 py-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">GEO 核心速查</div>
+            <div onclick="switchPage('page-dashboard', this)" class="sub-menu sidebar-active">品牌能见度智查</div>
+            <div onclick="switchPage('page-batch', this)" class="sub-menu">多平台批量查</div>
+            
+            <div class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">挖掘与管理</div>
+            <div onclick="switchPage('page-mining', this)" class="sub-menu">提问词挖掘</div>
+            <div onclick="switchPage('page-monitor', this)" class="sub-menu">打点管理</div>
+            
+            <div class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">内容供应链</div>
+            <div onclick="switchPage('page-plan', this)" class="sub-menu">供给计划</div>
+            <div onclick="switchPage('page-editor', this)" class="sub-menu">高引用率创作</div>
+            
+            <div class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">效果追踪</div>
+            <div onclick="switchPage('page-trace', this)" class="sub-menu">AI 引用追踪</div>
+        </nav>
     </aside>
 
-    <div class="flex-1 flex flex-col overflow-hidden relative">
-        <header class="h-14 bg-white border-b flex items-center justify-between px-8 shadow-sm">
-            <div class="flex items-center text-xs text-gray-400">
-                服务状态：<span class="text-green-500 ml-1">● 正常运行</span>
-            </div>
+    <main class="flex-1 flex flex-col overflow-hidden bg-[#fbfcfd]">
+        <header class="h-16 bg-white border-b flex items-center justify-between px-10">
+            <h2 id="current-title" class="font-bold text-lg text-slate-700">品牌能见度智查</h2>
             <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2 text-xs">
-                    <span class="bg-red-50 text-red-600 px-3 py-1 rounded-full font-bold">极客 Workflow 团队版</span>
-                    <span class="font-bold text-gray-700">Admin_GeekDance</span>
-                </div>
+                <span class="text-xs text-slate-400">余额: ¥888.00</span>
+                <div class="w-8 h-8 bg-slate-100 rounded-full border border-slate-200"></div>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-10 bg-[#fbfcfd]">
+        <section class="flex-1 overflow-y-auto p-10">
             
-            <div id="page-dashboard" class="page active max-w-6xl mx-auto text-center">
-                <h1 class="text-4xl font-bold mb-4">品牌<span class="text-[#DA251C]">能见度</span>智查</h1>
-                <p class="text-gray-400 mb-10">批量触达多 AI 平台，深度拆解品牌可见度、信源、观点及竞品</p>
-                <button class="geek-btn px-12 py-3 rounded-full text-lg font-bold mb-16 shadow-lg shadow-red-100">立即开始查询</button>
-                
-                <div class="grid grid-cols-3 gap-8">
-                    <div class="bg-white p-8 rounded-2xl card-shadow border-t-4 border-[#DA251C]">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase mb-4 tracking-widest">多平台能见度速查</p>
-                        <div class="text-3xl font-bold mb-6">1010 <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">达标</span></div>
-                        <div class="space-y-4 text-left">
-                            <div class="flex justify-between text-xs"><span>元宝 (腾讯系)</span><span class="font-bold">1012</span></div>
-                            <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden"><div class="progress-red w-[80%] h-full"></div></div>
-                            <div class="flex justify-between text-xs"><span>豆包 (字节系)</span><span class="font-bold">1010</span></div>
-                            <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden"><div class="bg-blue-600 w-[78%] h-full"></div></div>
+            <div id="page-dashboard" class="page active max-w-5xl mx-auto">
+                <div class="grid grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <p class="text-xs text-slate-400 mb-2">综合得分</p>
+                        <p class="text-4xl font-black text-[#DA251C]">1010</p>
+                    </div>
+                    <div class="col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-around">
+                        <canvas id="mainChart" style="max-width: 120px;"></canvas>
+                        <div class="text-sm space-y-2">
+                            <p>● 元宝: <span class="font-bold text-green-500">优</span></p>
+                            <p>● 豆包: <span class="font-bold text-blue-500">良</span></p>
                         </div>
                     </div>
-                    <div class="bg-white p-8 rounded-2xl card-shadow relative overflow-hidden flex flex-col items-center justify-center">
-                        <canvas id="sourceChart" class="z-0"></canvas>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center pt-8 z-10">
-                            <span class="text-[10px] text-gray-400 font-bold">社媒资讯引用占比</span>
-                            <span class="text-2xl font-bold text-[#DA251C]">46.3%</span>
+                </div>
+                <button onclick="handleAPI('dashboard')" class="w-full bg-[#DA251C] text-white py-4 rounded-xl font-bold shadow-lg hover:opacity-90 transition">立即刷新全平台数据 (消耗 5 积分)</button>
+            </div>
+
+            <div id="page-batch" class="page max-w-4xl mx-auto">
+                <div class="bg-white rounded-3xl p-8 shadow-sm border">
+                    <textarea id="batchInput" class="w-full h-48 p-6 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-red-100 outline-none text-sm" placeholder="输入多个提问，每行一个..."></textarea>
+                    <div class="flex items-center justify-between mt-6">
+                        <div class="flex space-x-2">
+                            <span class="px-3 py-1 bg-red-50 text-[#DA251C] text-[10px] rounded-full font-bold">✓ 豆包</span>
+                            <span class="px-3 py-1 bg-red-50 text-[#DA251C] text-[10px] rounded-full font-bold">✓ 元宝</span>
                         </div>
-                    </div>
-                    <div class="bg-white p-8 rounded-2xl card-shadow">
-                        <p class="text-[10px] text-gray-400 font-bold mb-4 tracking-widest">AI 对本品情绪</p>
-                        <div class="space-y-6 mt-4">
-                            <div class="text-left">
-                                <div class="flex justify-between text-[10px] mb-1"><span>正面评价 🚀</span><span>50%</span></div>
-                                <div class="w-full bg-gray-50 h-2 rounded-full overflow-hidden"><div class="progress-red w-1/2 h-full"></div></div>
-                            </div>
-                            <div class="text-left">
-                                <div class="flex justify-between text-[10px] mb-1"><span>竞品对比 ⚖️</span><span>33%</span></div>
-                                <div class="w-full bg-gray-50 h-2 rounded-full overflow-hidden"><div class="bg-gray-300 w-1/3 h-full"></div></div>
-                            </div>
-                        </div>
+                        <button onclick="handleAPI('batch')" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold flex items-center">
+                            <div id="batch-loader" class="loading-spinner mr-2"></div>
+                            <span>开始批量探测</span>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div id="page-batch" class="page max-w-5xl mx-auto">
-                <h2 class="text-3xl font-bold text-center mb-2">人工智能<span class="text-[#DA251C]">多平台批量</span>查询问</h2>
-                <p class="text-center text-gray-400 mb-10">一次提交最多100个关键词，打标签分类监测</p>
-                <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-                    <textarea class="w-full h-64 p-6 bg-gray-50 rounded-xl outline-none text-sm focus:ring-2 focus:ring-red-100 transition" placeholder="输入问题，一行一个。系统将自动打点百度、抖音、淘宝、京东等平台。"></textarea>
-                    <div class="mt-6 flex justify-between items-center">
-                        <span class="text-[10px] text-gray-400 font-bold">已录入: 0 / 100 词</span>
-                        <button class="geek-btn px-12 py-3 rounded-lg font-bold hover:opacity-90 transition">启动批量打点</button>
-                    </div>
+            <div id="page-mining" class="page max-w-4xl mx-auto">
+                <div class="bg-white p-10 rounded-3xl shadow-sm border text-center">
+                    <h3 class="text-2xl font-black mb-4">核心词挖掘矩阵</h3>
+                    <input type="text" id="miningInput" class="w-full max-w-md px-6 py-4 bg-slate-50 rounded-xl mb-6 outline-none focus:ring-2 focus:ring-red-200" placeholder="输入品牌名，如：极客跳动">
+                    <button onclick="handleAPI('mining')" class="block mx-auto bg-[#DA251C] text-white px-10 py-4 rounded-full font-bold shadow-lg">生成 AI 提问词</button>
+                    <div id="miningResult" class="mt-10 grid grid-cols-2 gap-4 text-left"></div>
                 </div>
             </div>
 
-            </main>
-    </div>
+            <div id="page-monitor" class="page text-center py-20 text-slate-400 italic">打点监控模块正在同步数据...</div>
+            <div id="page-plan" class="page text-center py-20 text-slate-400 italic">供给计划生成器就绪...</div>
+            <div id="page-editor" class="page text-center py-20 text-slate-400 italic">编辑器 API 接入中...</div>
+            <div id="page-trace" class="page text-center py-20 text-slate-400 italic">引用追踪系统在线...</div>
+
+        </section>
+    </main>
 
     <script>
-        // 1. 全球页面切换和菜单激活处理
-        function switchPage(pageId) {
-            // 隐藏所有页面
+        // 1. 路由切换逻辑
+        function switchPage(pageId, element) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // 显示目标页面
             document.getElementById(pageId).classList.add('active');
             
-            // 移除所有菜单的激活样式
             document.querySelectorAll('.sub-menu').forEach(m => m.classList.remove('sidebar-active'));
+            element.classList.add('sidebar-active');
             
-            // 给当前点击的菜单添加激活样式，触发居中和放大效果
-            event.currentTarget.classList.add('sidebar-active');
+            document.getElementById('current-title').innerText = element.innerText;
         }
 
-        // 2. 初始化首页信源环形图 (红黑灰色)
-        const sourceCtx = document.getElementById('sourceChart').getContext('2d');
-        new Chart(sourceCtx, {
+        // 2. 核心 API 模拟/实战函数
+        async function handleAPI(type) {
+            const loader = document.getElementById('batch-loader');
+            if(loader) loader.style.display = 'inline-block';
+
+            // 这里是以后填入 API URL 的地方
+            // const response = await fetch('https://api.yourdomain.com/v1/geo', { ... });
+            
+            // 模拟 1.5 秒的网络延迟
+            setTimeout(() => {
+                if(loader) loader.style.display = 'none';
+                
+                if(type === 'batch') {
+                    alert("批量探测请求已发送！请在“打点管理”查看进度。");
+                } else if(type === 'mining') {
+                    const res = document.getElementById('miningResult');
+                    res.innerHTML = `
+                        <div class="p-4 bg-red-50 rounded-xl border border-red-100"><p class="text-xs font-bold text-red-700">场景 A：研发选型</p><p class="text-sm">“极客跳动的定制交付快吗？”</p></div>
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100"><p class="text-xs font-bold text-slate-700">场景 B：口碑对比</p><p class="text-sm">“对比极联软件，极客跳动优势在哪？”</p></div>
+                    `;
+                } else {
+                    alert("数据已更新！");
+                }
+            }, 1500);
+        }
+
+        // 初始化图表
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        new Chart(ctx, {
             type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [46.3, 33.7, 20.0],
-                    backgroundColor: ['#DA251C', '#1a1a1a', '#e5e7eb'],
-                    borderWidth: 0,
-                    cutout: '90%'
-                }]
-            },
-            options: { plugins: { legend: { display: false } }, animation: { animateScale: true } }
+            data: { datasets: [{ data: [46, 54], backgroundColor: ['#DA251C', '#f1f5f9'], borderWidth: 0 }] },
+            options: { cutout: '80%', plugins: { legend: { display: false } } }
         });
     </script>
 </body>
