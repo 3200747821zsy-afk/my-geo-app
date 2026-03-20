@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>GEO 品牌能见度监测平台 - 演示版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <nav class="bg-blue-700 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">GEO 检索与 AI 能见度平台</h1>
+            <div class="space-x-4">
+                <span class="bg-blue-500 px-3 py-1 rounded text-sm">新邦小豆芽 团队版已激活</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto py-8 px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
+                <p class="text-gray-500 text-sm">品牌综合能见度</p>
+                <h3 class="text-2xl font-bold text-gray-800">68.5%</h3>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+                <p class="text-gray-500 text-sm">抖音(豆包)权重</p>
+                <h3 class="text-2xl font-bold text-gray-800">极高</h3>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-yellow-500">
+                <p class="text-gray-500 text-sm">待处理负面情绪</p>
+                <h3 class="text-2xl font-bold text-gray-800">2 条</h3>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
+                <p class="text-gray-500 text-sm">本月引用总数</p>
+                <h3 class="text-2xl font-bold text-gray-800">1,240 次</h3>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-bold mb-4">品牌位次波动曲线 (AI 推荐排名)</h3>
+                    <canvas id="rankChart" height="100"></canvas>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-bold mb-4">内容生产工作流 (Workflow)</h3>
+                    <div class="border-2 border-dashed border-gray-200 p-4 rounded">
+                        <p class="text-sm text-gray-600 mb-2">输入品牌关键词：</p>
+                        <input type="text" placeholder="例如：极客跳动 软件开发" class="w-full p-2 border rounded mb-4">
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">智能生成 5 个核心词并排产</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-bold mb-4">信源反查与引用追踪</h3>
+                <ul class="space-y-4">
+                    <li class="flex justify-between items-center border-b pb-2">
+                        <div>
+                            <p class="text-sm font-medium">抖音: v.douyin.com/...</p>
+                            <p class="text-xs text-gray-400">被豆包引用 45 次</p>
+                        </div>
+                        <span class="text-green-600 text-sm font-bold">高权重</span>
+                    </li>
+                    <li class="flex justify-between items-center border-b pb-2">
+                        <div>
+                            <p class="text-sm font-medium">知乎: zhuanlan.zhihu...</p>
+                            <p class="text-xs text-gray-400">被Kimi引用 12 次</p>
+                        </div>
+                        <span class="text-blue-600 text-sm font-bold">中权重</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm font-medium">小红书: xiaohongshu...</p>
+                            <p class="text-xs text-red-400 font-bold">无法被AI抓取</p>
+                        </div>
+                        <span class="text-gray-400 text-sm">引用 0</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('rankChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                datasets: [{
+                    label: '搜索位次 (越小越靠前)',
+                    data: [5, 4, 2, 3, 1, 2, 1],
+                    borderColor: 'rgb(59, 130, 246)',
+                    tension: 0.3,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: { y: { reverse: true, min: 1, max: 10 } }
+            }
+        });
+    </script>
+</body>
+</html>
