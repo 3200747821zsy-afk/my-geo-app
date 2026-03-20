@@ -3,186 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>极客跳动 - GEO 智能管理后台</title>
+    <title>极客跳动智算平台 - GEO 场景速查</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --geek-green: #86d53b; }
-        body { font-family: "PingFang SC", sans-serif; background-color: #f4f7f6; }
-        
-        /* 侧边栏样式 */
-        .sub-menu { 
-            padding: 0 1.5rem; font-size: 0.85rem; color: #555; cursor: pointer; 
-            height: 40px; display: flex; align-items: center; transition: all 0.2s;
-        }
-        .sub-menu.sidebar-active { 
-            background-color: var(--geek-green) !important; color: white !important; 
-            justify-content: center !important; font-size: 1.1rem !important; font-weight: bold;
-            height: 50px !important; box-shadow: 0 4px 12px rgba(134, 213, 59, 0.2);
-        }
-        
+        :root { --geek-green: #86d53b; --geek-dark: #1a1a1a; }
+        body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background-color: #f5f7fa; }
+        .sidebar-item:hover { background-color: #f0fdf4; color: var(--geek-green); }
+        .sidebar-active { background-color: #86d53b !important; color: white !important; font-weight: bold; }
+        .card-shadow { box-shadow: 0 2px 12px 0 rgba(0,0,0,0.05); }
+        .geek-btn { background-color: #1a1a1a; color: white; transition: all 0.3s; }
+        .geek-btn:hover { background-color: #333; transform: translateY(-1px); }
+        .sub-menu { padding-left: 3rem; font-size: 0.8rem; color: #666; cursor: pointer; height: 36px; display: flex; items-center; }
+        .sub-menu:hover { color: var(--geek-green); }
         .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* 元素样式 */
-        .card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #edf2f7; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .geek-btn { background: var(--geek-green); color: white; padding: 10px 24px; border-radius: 6px; font-weight: bold; }
-        .tag { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .page.active { display: block; }
+        /* 隐藏滚动条但保持功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-gray-800">
 
-    <aside class="w-64 bg-white border-r flex flex-col flex-shrink-0 z-10 shadow-sm">
-        <div class="p-6 border-b flex items-center space-x-3">
-            <img src="社交头像.png" class="w-8 h-8">
-            <span class="font-bold text-sm">极客跳动智算平台</span>
+    <aside class="w-64 bg-white border-r flex flex-col flex-shrink-0 z-10">
+        <div class="p-4 border-b flex items-center space-x-2">
+            <img src="logo.png" alt="极客跳动" class="h-8 object-contain">
+            <span class="font-bold text-sm tracking-tighter">极客跳动的智...</span>
         </div>
-        <div class="flex-1 overflow-y-auto py-4">
-            <div class="px-6 py-2 text-[10px] text-gray-300 font-bold uppercase tracking-widest">GEO 场景速查</div>
-            <div onclick="switchPage('dashboard', this)" class="sub-menu sidebar-active">能见度总览</div>
-            <div onclick="switchPage('batch', this)" class="sub-menu">多平台批量查</div>
-            
-            <div class="px-6 py-4 text-[10px] text-gray-300 font-bold uppercase tracking-widest">内容生产</div>
-            <div onclick="switchPage('mining', this)" class="sub-menu">提问词挖掘</div>
-            <div onclick="switchPage('creator', this)" class="sub-menu">高引用率创作</div>
+        
+        <div class="flex-1 overflow-y-auto no-scrollbar py-2">
+            <div class="group">
+                <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
+                    <span class="text-xs font-bold flex items-center"><span class="mr-2">🧭</span> GEO 场景速查</span>
+                    <span class="text-[10px] text-gray-400">▲</span>
+                </div>
+                <div onclick="switchPage('page-dashboard')" class="sub-menu sidebar-active">品牌能见度智查</div>
+                <div onclick="switchPage('page-batch')" class="sub-menu">多平台批量查</div>
+            </div>
+
+            <div class="group mt-2">
+                <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
+                    <span class="text-xs font-bold flex items-center"><span class="mr-2">🔍</span> 提问词管理</span>
+                    <span class="text-[10px] text-gray-400">▲</span>
+                </div>
+                <div onclick="switchPage('page-mining')" class="sub-menu">提问词挖掘</div>
+                <div onclick="switchPage('page-monitor')" class="sub-menu">打点管理</div>
+            </div>
+
+            <div class="group mt-2">
+                <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
+                    <span class="text-xs font-bold flex items-center"><span class="mr-2">✍️</span> 内容制作</span>
+                    <span class="text-[10px] text-gray-400">▲</span>
+                </div>
+                <div onclick="switchPage('page-plan')" class="sub-menu">供给计划</div>
+                <div onclick="switchPage('page-editor')" class="sub-menu">高引用率创作</div>
+            </div>
+
+            <div class="group mt-2">
+                <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
+                    <span class="text-xs font-bold flex items-center"><span class="mr-2">🔗</span> AI 引用追踪</span>
+                    <span class="text-[10px] text-gray-400">▲</span>
+                </div>
+                <div onclick="switchPage('page-trace-upload')" class="sub-menu">上传查询</div>
+                <div onclick="switchPage('page-trace-detail')" class="sub-menu">引用详情</div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t space-y-2">
+            <div class="flex items-center text-xs text-gray-500 px-2 py-1 hover:bg-gray-50 rounded cursor-pointer">⚙️ 企业设置</div>
+            <div class="flex items-center text-xs text-gray-500 px-2 py-1 hover:bg-gray-50 rounded cursor-pointer">👥 极客工作流程</div>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col overflow-hidden bg-[#f8fafc]">
-        <header class="h-14 bg-white border-b flex items-center justify-between px-8">
-            <div class="flex items-center space-x-2 text-xs text-gray-400">
-                <span>主页</span> <span class="text-gray-300">/</span> <span class="text-gray-600 font-medium">多维度数据可视化分析</span>
-            </div>
-            <div class="flex items-center space-x-4">
-                <span class="text-xs text-blue-500">分享得赠金</span>
-                <img src="社交头像.png" class="w-6 h-6 rounded-full border">
+    <div class="flex-1 flex flex-col overflow-hidden relative">
+        <header class="h-14 bg-white border-b flex items-center justify-end px-8 space-x-4">
+            <div class="flex items-center space-x-2 text-xs">
+                <span class="bg-gray-100 px-2 py-1 rounded">分享得赠金</span>
+                <span class="font-bold text-gray-700">Admin_Geek</span>
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-8">
+        <main class="flex-1 overflow-y-auto p-10 bg-[#fbfcfd]">
             
-            <div id="dashboard" class="page active space-y-6">
+            <div id="page-dashboard" class="page active max-w-6xl mx-auto text-center">
+                <h1 class="text-4xl font-bold mb-4">品牌<span class="text-[#86d53b]">能见度</span>智查</h1>
+                <p class="text-gray-400 mb-10">批量触达多 AI 平台，深度拆解品牌可见度、信源、观点及竞品</p>
+                <button class="geek-btn px-12 py-3 rounded text-lg font-bold mb-16">立即查询</button>
                 
-                <div class="grid grid-cols-4 gap-6">
-                    <div class="col-span-3 card flex items-start space-x-6">
-                        <div class="w-24 h-24 bg-gray-100 rounded-xl flex items-center justify-center text-4xl font-bold text-gray-300 border-2 border-dashed">F</div>
-                        <div class="flex-1">
-                            <h3 class="text-lg font-bold mb-1">极客跳动</h3>
-                            <p class="text-[11px] text-gray-400 leading-relaxed mb-3">极客跳动是一家专注于软件定制开发的技术服务公司，长期为企业提供高质量、可扩展的数字化产品解决方案...</p>
-                            <div class="flex items-center space-x-4 text-[10px]">
-                                <span class="text-blue-500">官网URL: https://www.geekdance.cn</span>
-                                <div class="flex items-center -space-x-2">
-                                    <div class="w-5 h-5 rounded-full bg-gray-200 border border-white"></div>
-                                    <div class="w-5 h-5 rounded-full bg-gray-300 border border-white"></div>
-                                    <span class="ml-4 text-gray-400">主要竞争对手: 极客上线, 虎克技术, 中犇科技...</span>
+                <div class="grid grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-2xl card-shadow border-t-4 border-[#86d53b]">
+                        <p class="text-[10px] text-gray-400 font-bold uppercase mb-4">多平台能见度速查</p>
+                        <div class="text-3xl font-bold mb-6">1010 <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">合格</span></div>
+                        <div class="space-y-4 text-left">
+                            <div class="flex justify-between text-xs"><span>元宝</span><span class="font-bold">1012</span></div>
+                            <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden"><div class="bg-[#86d53b] w-[80%] h-full"></div></div>
+                            <div class="flex justify-between text-xs"><span>豆包</span><span class="font-bold">1010</span></div>
+                            <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden"><div class="bg-blue-400 w-[78%] h-full"></div></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-2xl card-shadow">
+                        <p class="text-[10px] text-gray-400 font-bold mb-4">信源聚合占比</p>
+                        <div class="h-40 flex items-center justify-center relative">
+                            <canvas id="sourceChart"></canvas>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center pt-4">
+                                <span class="text-2xl font-bold">46.3%</span>
+                                <span class="text-[10px] text-gray-400">社媒资讯</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-2xl card-shadow">
+                        <p class="text-[10px] text-gray-400 font-bold mb-4">AI 对本品情绪</p>
+                        <div class="space-y-6 mt-4">
+                            <div class="text-left">
+                                <div class="flex justify-between text-[10px] mb-1"><span>正面 🥳</span><span>50% / 50次提及</span></div>
+                                <div class="w-full bg-gray-50 h-2 rounded-full overflow-hidden"><div class="bg-green-400 w-1/2 h-full"></div></div>
+                            </div>
+                            <div class="text-left">
+                                <div class="flex justify-between text-[10px] mb-1"><span>负面 😡</span><span>17% / 17次提及</span></div>
+                                <div class="w-full bg-gray-50 h-2 rounded-full overflow-hidden"><div class="bg-red-400 w-[17%] h-full"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-batch" class="page max-w-5xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-2">人工智能<span class="text-[#86d53b]">多平台批量</span>查询问</h2>
+                <p class="text-center text-gray-400 mb-10">批量提问省时间 · 多平台结果集中查 (支持 100 个关键词)</p>
+                <div class="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+                    <textarea class="w-full h-64 p-6 bg-gray-50 rounded-xl outline-none text-sm focus:ring-1 focus:ring-[#86d53b]" placeholder="输入问题，一行一个。多平台查询换行。"></textarea>
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <div class="flex items-center bg-[#86d53b] text-white px-3 py-1.5 rounded-lg text-xs cursor-pointer">✅ 豆包</div>
+                        <div class="flex items-center bg-[#86d53b] text-white px-3 py-1.5 rounded-lg text-xs cursor-pointer">✅ 元宝</div>
+                        <div class="flex items-center border px-3 py-1.5 rounded-lg text-xs text-gray-400 cursor-not-allowed">深潜 (即将上线)</div>
+                        <div class="flex items-center border px-3 py-1.5 rounded-lg text-xs text-gray-400 cursor-not-allowed">百度AI</div>
+                    </div>
+                    <div class="mt-8 flex justify-end">
+                        <button class="bg-gray-200 text-gray-500 px-10 py-3 rounded-lg font-bold">开始查询 (0/20)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-mining" class="page">
+                <h2 class="text-2xl font-bold mb-8">提问词<span class="text-[#86d53b]">挖掘墓</span></h2>
+                <div class="bg-white p-8 rounded-xl shadow-sm grid grid-cols-2 gap-10">
+                    <div class="border-r pr-10">
+                        <h4 class="font-bold mb-4 flex items-center">品类词扩展 <span class="ml-2 text-[10px] bg-green-50 text-green-600 px-1 rounded">AI推荐</span></h4>
+                        <p class="text-xs text-gray-400 mb-4">我有商品类词，搜索用户购买实际过程，会怎么向 AI 提问</p>
+                        <textarea class="w-full h-32 border rounded-lg p-4 text-xs mb-4" placeholder="输入关键词，最多5个"></textarea>
+                        <button class="bg-gray-100 text-gray-400 w-full py-2 rounded text-xs">开始查询</button>
+                    </div>
+                    <div>
+                        <div class="bg-gray-50 p-6 rounded-xl">
+                            <p class="text-xs font-bold text-gray-500 mb-4">参考样例</p>
+                            <div class="flex space-x-8">
+                                <div class="text-xs">
+                                    <p class="text-gray-400 mb-2">🖊️ 输入品类词</p>
+                                    <p class="bg-white px-3 py-2 border rounded">智能空调</p>
+                                </div>
+                                <div class="text-xs flex-1">
+                                    <p class="text-gray-400 mb-2">🔍 对应提问</p>
+                                    <ul class="space-y-2">
+                                        <li>• 节能空调哪个品牌性价比高？</li>
+                                        <li>• 带新风功能的空调推荐？</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="card flex flex-col items-center justify-center text-center">
-                        <p class="text-[10px] text-gray-400 font-bold mb-2 uppercase">品牌得分</p>
-                        <div class="relative w-20 h-20 mb-2">
-                            <canvas id="scoreGauge"></canvas>
-                            <div class="absolute inset-0 flex items-center justify-center text-2xl font-bold text-red-500">3</div>
-                        </div>
-                        <p class="text-[10px] text-gray-400">低 <span class="text-green-500">↑ 1</span></p>
-                    </div>
                 </div>
+            </div>
 
-                <div class="grid grid-cols-4 gap-6">
-                    <div class="card"><p class="text-[10px] text-gray-400 font-bold mb-2">曝光度</p><p class="text-2xl font-bold text-gray-700">3.0% <span class="text-xs text-green-500 font-normal">↑ 0.02</span></p></div>
-                    <div class="card"><p class="text-[10px] text-gray-400 font-bold mb-2">品牌提及次数</p><p class="text-2xl font-bold text-gray-700">4 <span class="text-xs text-green-500 font-normal">↑ 2</span></p></div>
-                    <div class="card"><p class="text-[10px] text-gray-400 font-bold mb-2">情感得分</p><p class="text-2xl font-bold text-gray-700">89 <span class="text-xs text-yellow-500 font-normal">稳定</span></p></div>
-                    <div class="card"><p class="text-[10px] text-gray-400 font-bold mb-2">综合排名</p><p class="text-2xl font-bold text-gray-700">#2 <span class="text-xs text-red-500 font-normal">↓ 1</span></p></div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-6">
-                    <div class="card">
-                        <div class="flex items-center space-x-2 mb-6">
-                            <span class="text-yellow-400">✨</span>
-                            <h4 class="font-bold">AI 智能内容创作</h4>
-                        </div>
-                        <p class="text-[11px] text-gray-400 mb-4">输入你的品牌和产品，AI 将为你生成符合 GEO 逻辑的文案：</p>
-                        <input type="text" class="w-full p-3 border rounded-lg mb-4 text-sm bg-gray-50" value="极客跳动软件定制">
-                        <button class="w-full py-3 bg-blue-600 text-white rounded-lg font-bold text-sm mb-4">立即生成铺设计划</button>
-                        <div class="p-4 bg-gray-50 rounded-lg border border-dashed text-xs text-gray-400 h-32 flex items-center justify-center">
-                            出错了: Insufficient Balance (演示占位)
+            <div id="page-plan" class="page text-center">
+                <h2 class="text-4xl font-bold mb-6">铺设置<span class="text-[#86d53b]">计划</span></h2>
+                <p class="text-gray-400 mb-10">基于 AI 洞察，自动生成内容公式框架，一键输出高质量 GEO 内容</p>
+                <button class="geek-btn px-10 py-3 rounded-lg font-bold mb-16">新建计划</button>
+                <div class="grid grid-cols-3 gap-6 text-left">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-[#86d53b]">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase mb-4">主题 & 关键词</h4>
+                        <div class="space-y-4">
+                            <div class="h-2 bg-green-100 rounded-full w-[90%]"></div>
+                            <div class="h-2 bg-blue-100 rounded-full w-[70%]"></div>
+                            <div class="h-2 bg-gray-100 rounded-full w-[40%]"></div>
                         </div>
                     </div>
-
-                    <div class="card flex flex-col">
-                        <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center space-x-2">
-                                <span class="text-blue-500">📊</span>
-                                <h4 class="font-bold">品牌位次实时监测</h4>
-                            </div>
-                            <div class="flex items-center space-x-2 text-[10px] text-gray-400">
-                                <div class="w-8 h-0.5 bg-blue-500"></div> <span>本品在 AI 回答中的位次</span>
-                            </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase mb-4">标题生成器</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] border px-2 py-1 rounded">测评</span>
+                            <span class="text-[10px] border px-2 py-1 rounded">排行</span>
+                            <span class="text-[10px] border px-2 py-1 rounded">对比</span>
                         </div>
-                        <div class="flex-1 h-48">
-                            <canvas id="rankingChart"></canvas>
-                        </div>
-                        <div class="mt-4 pt-4 border-t space-y-2">
-                            <p class="text-[10px] font-bold text-gray-500">引用分析说明：</p>
-                            <div class="flex items-center space-x-4 text-[9px] text-gray-400">
-                                <span>✅ 豆包: 优先抓取抖音/头条 (高权重)</span>
-                                <span>✅ Kimi/DeepSeek: 倾向抓取知乎/官网</span>
-                                <span class="text-red-400">❌ 小红书: AI 无法直接抓取 (引用显示为 0)</span>
-                            </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm relative overflow-hidden">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase mb-4">内容结构</h4>
+                        <div class="text-[10px] text-white bg-black px-2 py-1 rounded inline-block">关键词密度控制</div>
+                        <div class="mt-4 space-y-2 opacity-30">
+                            <div class="h-2 bg-gray-200 rounded w-full"></div>
+                            <div class="h-2 bg-gray-200 rounded w-full"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="batch" class="page text-center py-20 text-gray-400">多平台批量查询页面正在开发...</div>
-        </div>
-    </main>
+            <div id="page-trace-upload" class="page text-center">
+                <h2 class="text-4xl font-bold mb-6">人工智能<span class="text-[#86d53b]">引用</span>追踪</h2>
+                <p class="text-gray-400 mb-10">上传后持续追踪引用情况，精准优化不踩坑</p>
+                <button class="geek-btn px-12 py-3 rounded-lg font-bold mb-20">立即查询</button>
+                
+                <div class="flex items-center justify-between max-w-4xl mx-auto space-x-8">
+                    <div class="flex-1 bg-white p-6 rounded-2xl shadow-sm">
+                        <span class="text-blue-500 font-bold block mb-2">STEP 01</span>
+                        <h5 class="font-bold text-sm mb-2">上传文章链接</h5>
+                        <p class="text-[10px] text-gray-400">支持任意链接，兼容官网与境外站点</p>
+                    </div>
+                    <div class="flex-1 bg-white p-6 rounded-2xl shadow-sm opacity-50">
+                        <span class="text-green-500 font-bold block mb-2">STEP 02</span>
+                        <h5 class="font-bold text-sm mb-2">系统智能匹配</h5>
+                    </div>
+                    <div class="flex-1 bg-white p-6 rounded-2xl shadow-sm border-2 border-[#86d53b]">
+                        <span class="text-orange-500 font-bold block mb-2">STEP 03</span>
+                        <h5 class="font-bold text-sm mb-2">输出引用报告</h5>
+                        <p class="text-[10px] text-[#86d53b] font-bold">引用率 82%</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
 
     <script>
-        // 1. 页面切换
-        function switchPage(pageId, element) {
+        // 页面切换逻辑
+        function switchPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
+            
+            // 菜单激活状态切换
             document.querySelectorAll('.sub-menu').forEach(m => m.classList.remove('sidebar-active'));
-            element.classList.add('sidebar-active');
+            event.currentTarget.classList.add('sidebar-active');
         }
 
-        // 2. 初始化得分仪表盘 (简易版)
-        const gaugeCtx = document.getElementById('scoreGauge').getContext('2d');
-        new Chart(gaugeCtx, {
+        // 初始化环形图 (信源占比)
+        const sourceCtx = document.getElementById('sourceChart').getContext('2d');
+        new Chart(sourceCtx, {
             type: 'doughnut',
-            data: { datasets: [{ data: [3, 97], backgroundColor: ['#ef4444', '#f3f4f6'], borderWidth: 0 }] },
-            options: { cutout: '80%', plugins: { legend: { display: false } } }
-        });
-
-        // 3. 初始化位次实时监测折线图 (还原图 8106be)
-        const rankCtx = document.getElementById('rankingChart').getContext('2d');
-        new Chart(rankCtx, {
-            type: 'line',
             data: {
-                labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
                 datasets: [{
-                    label: '排名位次',
-                    data: [8, 6, 4, 5, 2, 3, 2], // 模拟图中的位次波动
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.05)',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#fff',
-                    pointBorderWidth: 2
+                    data: [46.3, 33.7, 20.0],
+                    backgroundColor: ['#86d53b', '#6366f1', '#e5e7eb'],
+                    borderWidth: 0,
+                    cutout: '85%'
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { reverse: true, min: 1, max: 10, ticks: { stepSize: 1, font: { size: 9 } } },
-                    x: { grid: { display: false }, ticks: { font: { size: 9 } } }
-                },
-                plugins: { legend: { display: false } }
+            options: { plugins: { legend: { display: false } } }
+        });
+
+        // 模拟交互：如果输入小红书链接，自动显示反查逻辑说明
+        document.querySelector('textarea').addEventListener('input', function(e) {
+            if(e.target.value.includes('xiaohongshu')) {
+                console.log("检测到小红书信源，自动应用反查逻辑：引用显示为0");
             }
         });
     </script>
