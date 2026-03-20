@@ -7,17 +7,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* 1. 【核心修改】：调整主色调为红色 */
         :root { --geek-red: #DA251C; --geek-dark: #1a1a1a; }
         body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background-color: #f5f7fa; }
         
-        /* 1. 侧边栏基础样式 */
+        /* 2. 侧边栏基础和激活状态样式 */
         .sidebar-item:hover { background-color: #fef2f2; color: var(--geek-red); }
         .sidebar-active { background-color: var(--geek-red) !important; color: white !important; font-weight: bold; }
         
-        /* 2. 框住的二级菜单 (子菜单) 基础样式 */
+        /* 3. 二级菜单 (子菜单) 样式 */
         .sub-menu { 
             padding: 0 1rem; 
-            font-size: 0.8rem; /* 默认字号较小 */
+            font-size: 0.8rem; 
             color: #666; 
             cursor: pointer; 
             height: 38px; 
@@ -29,26 +30,26 @@
         }
         .sub-menu:hover { color: var(--geek-red); background-color: #fef2f2; }
 
-        /* 3. 【核心修改】：针对激活状态（被框住）子菜单的居中和放大样式 */
+        /* 4. 【上步保留】：针对激活状态子菜单的居中和放大样式 */
         .sub-menu.sidebar-active { 
             justify-content: center !important; /* 排版居中 */
             font-size: 1.2rem !important;      /* 字号放大到 text-lg */
             height: 52px !important;            /* 对应增加高度 */
             padding: 0.5rem 1rem !important;    /* 增加上下内边距 */
-            letter-spacing: 0.05em;             /* 增加一点字间距提高可读性 */
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); /* 增加一点内阴影增强选中感 */
+            letter-spacing: 0.05em;             
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); 
         }
 
-        /* 其他功能性样式 */
+        /* 5. 按钮和进度条样式 */
         .card-shadow { box-shadow: 0 2px 12px 0 rgba(0,0,0,0.05); }
-        .geek-btn { background-color: #DA251C; color: white; transition: all 0.3s; }
+        .geek-btn { background-color: var(--geek-red); color: white; transition: all 0.3s; }
         .geek-btn:hover { background-color: #b91c1c; transform: translateY(-1px); shadow: 0 4px 6px rgba(218, 37, 28, 0.2); }
         .page { display: none; }
         .page.active { display: block; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* 自定义进度条颜色 */
-        .progress-red { background-color: #DA251C; }
+        /* 6. 自定义进度条颜色 */
+        .progress-red { background-color: var(--geek-red); }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-gray-800">
@@ -164,7 +165,7 @@
                 <h2 class="text-3xl font-bold text-center mb-2">人工智能<span class="text-[#DA251C]">多平台批量</span>查询问</h2>
                 <p class="text-center text-gray-400 mb-10">一次提交最多100个关键词，打标签分类监测</p>
                 <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-                    <textarea class="w-full h-64 p-6 bg-gray-50 rounded-xl outline-none text-sm focus:ring-2 focus:ring-red-100 transition" placeholder="输入问题，一行一个。系统将自动打点百度、抖音、淘宝、京东等平台。"></textarea>
+                    <textarea class="w-full h-64 p-6 bg-gray-50 rounded-xl outline-none text-sm focus:ring-2 focus:ring-red-100 transition" placeholder="输入问题，一行一个。系统将自动打点百度、抖音、淘宝、京东等平台。"></stdio>
                     <div class="mt-6 flex justify-between items-center">
                         <span class="text-[10px] text-gray-400 font-bold">已录入: 0 / 100 词</span>
                         <button class="geek-btn px-12 py-3 rounded-lg font-bold hover:opacity-90 transition">启动批量打点</button>
