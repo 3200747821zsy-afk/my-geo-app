@@ -2,103 +2,125 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>GEO 品牌能见度监测平台 - 演示版</title>
+    <title>GEO 品牌能见度监测平台 - AI 实战版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 font-sans">
     <nav class="bg-blue-700 text-white p-4 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold">GEO 检索与 AI 能见度平台</h1>
-            <div class="space-x-4">
-                <span class="bg-blue-500 px-3 py-1 rounded text-sm">新邦小豆芽 团队版已激活</span>
-            </div>
+        <div class="container mx-auto flex justify-between">
+            <h1 class="text-xl font-bold">GEO 检索与 AI 能见度平台 (实时版)</h1>
+            <span class="bg-green-500 px-3 py-1 rounded text-sm">DeepSeek AI 已就绪</span>
         </div>
     </nav>
 
     <div class="container mx-auto py-8 px-4">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
-                <p class="text-gray-500 text-sm">品牌综合能见度</p>
-                <h3 class="text-2xl font-bold text-gray-800">68.5%</h3>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
-                <p class="text-gray-500 text-sm">抖音(豆包)权重</p>
-                <h3 class="text-2xl font-bold text-gray-800">极高</h3>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-yellow-500">
-                <p class="text-gray-500 text-sm">待处理负面情绪</p>
-                <h3 class="text-2xl font-bold text-gray-800">2 条</h3>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
-                <p class="text-gray-500 text-sm">本月引用总数</p>
-                <h3 class="text-2xl font-bold text-gray-800">1,240 次</h3>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="font-bold mb-4">品牌位次波动曲线 (AI 推荐排名)</h3>
-                    <canvas id="rankChart" height="100"></canvas>
-                </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="font-bold mb-4 text-blue-600 text-lg">✨ AI 智能内容创作</h3>
+                <p class="text-sm text-gray-500 mb-4">输入你的品牌和产品，AI 将为你生成符合 GEO 逻辑的文案：</p>
                 
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h3 class="font-bold mb-4">内容生产工作流 (Workflow)</h3>
-                    <div class="border-2 border-dashed border-gray-200 p-4 rounded">
-                        <p class="text-sm text-gray-600 mb-2">输入品牌关键词：</p>
-                        <input type="text" placeholder="例如：极客跳动 软件开发" class="w-full p-2 border rounded mb-4">
-                        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">智能生成 5 个核心词并排产</button>
-                    </div>
+                <input type="text" id="brandInput" placeholder="例如：极客跳动 软件开发" 
+                       class="w-full p-3 border-2 border-blue-100 rounded-lg mb-4 focus:border-blue-500 outline-none">
+                
+                <button onclick="generateRealContent()" id="btnText"
+                        class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">
+                    立即生成铺设计划
+                </button>
+
+                <div id="resultArea" class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200 min-h-[200px] text-gray-700 whitespace-pre-wrap text-sm">
+                    生成的文案将显示在这里...
                 </div>
             </div>
 
             <div class="bg-white p-6 rounded-lg shadow">
-                <h3 class="font-bold mb-4">信源反查与引用追踪</h3>
-                <ul class="space-y-4">
-                    <li class="flex justify-between items-center border-b pb-2">
-                        <div>
-                            <p class="text-sm font-medium">抖音: v.douyin.com/...</p>
-                            <p class="text-xs text-gray-400">被豆包引用 45 次</p>
-                        </div>
-                        <span class="text-green-600 text-sm font-bold">高权重</span>
-                    </li>
-                    <li class="flex justify-between items-center border-b pb-2">
-                        <div>
-                            <p class="text-sm font-medium">知乎: zhuanlan.zhihu...</p>
-                            <p class="text-xs text-gray-400">被Kimi引用 12 次</p>
-                        </div>
-                        <span class="text-blue-600 text-sm font-bold">中权重</span>
-                    </li>
-                    <li class="flex justify-between items-center">
-                        <div>
-                            <p class="text-sm font-medium">小红书: xiaohongshu...</p>
-                            <p class="text-xs text-red-400 font-bold">无法被AI抓取</p>
-                        </div>
-                        <span class="text-gray-400 text-sm">引用 0</span>
-                    </li>
-                </ul>
+                <h3 class="font-bold mb-4 text-gray-800 text-lg">📊 品牌位次实时监测</h3>
+                <canvas id="rankChart" height="150"></canvas>
+                <div class="mt-6">
+                    <h4 class="font-bold text-sm mb-2 text-gray-600">引用分析说明：</h4>
+                    <div class="text-xs space-y-2 text-gray-500">
+                        <p>✅ 豆包 (字节): 优先抓取抖音/头条信源 (高权重)</p>
+                        <p>✅ Kimi/DeepSeek: 倾向于抓取新闻/知乎/官网链接</p>
+                        <p>❌ 小红书: 目前 API 封闭，AI 无法直接抓取 (引用显示为0)</p>
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
 
     <script>
+        // --- 关键配置：在这里填入你的 API Key ---
+        const DEEPSEEK_API_KEY = "这里填入你申请的sk-开头的Key"; 
+
+        async function generateRealContent() {
+            const brandInput = document.getElementById('brandInput').value;
+            const resultArea = document.getElementById('resultArea');
+            const btnText = document.getElementById('btnText');
+
+            if (!brandInput) {
+                alert("请输入品牌信息！");
+                return;
+            }
+
+            // 状态变更为加载中
+            btnText.innerText = "AI 正在思考中...";
+            btnText.disabled = true;
+            resultArea.innerText = "正在链接 DeepSeek 脑库，请稍候...";
+
+            try {
+                const response = await fetch('https://api.deepseek.com/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: "deepseek-chat",
+                        messages: [
+                            {
+                                role: "system", 
+                                content: "你是一个GEO(生成式引擎优化)专家。请根据用户提供的品牌信息，生成一段结构清晰、包含核心关键词、利于被AI模型采信的推荐文案。"
+                            },
+                            {role: "user", content: brandInput}
+                        ],
+                        stream: false
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.choices && data.choices[0]) {
+                    resultArea.innerText = data.choices[0].message.content;
+                } else {
+                    resultArea.innerText = "出错了：" + (data.error ? data.error.message : "未知错误");
+                }
+            } catch (error) {
+                resultArea.innerText = "连接 AI 失败，请检查网络或 API Key 是否正确。";
+                console.error(error);
+            } finally {
+                btnText.innerText = "立即生成铺设计划";
+                btnText.disabled = false;
+            }
+        }
+
+        // 绘制图表逻辑
         const ctx = document.getElementById('rankChart').getContext('2d');
         new Chart(ctx, {
             type: 'line',
             data: {
                 labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
                 datasets: [{
-                    label: '搜索位次 (越小越靠前)',
-                    data: [5, 4, 2, 3, 1, 2, 1],
-                    borderColor: 'rgb(59, 130, 246)',
-                    tension: 0.3,
-                    fill: false
+                    label: '本品在AI回答中的位次',
+                    data: [8, 6, 4, 5, 2, 3, 2],
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    fill: true,
+                    tension: 0.4
                 }]
             },
-            options: {
-                scales: { y: { reverse: true, min: 1, max: 10 } }
-            }
+            options: { scales: { y: { reverse: true, min: 1, max: 10 } } }
         });
     </script>
 </body>
